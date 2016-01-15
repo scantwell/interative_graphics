@@ -1,3 +1,4 @@
+TARGET=red_triangle
 IDIR =../include
 CC=g++
 CFLAGS=-Wall -pedantic -I$(IDIR)
@@ -13,11 +14,15 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = red_triangle.o InitShader.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+all: directories $(TARGET)
+
+directories:
+	mkdir -p $(ODIR)
 
 red_triangle: $(OBJ)
 	$(CC) -o $@ $^  $(CFLAGS) $(LIBS)
 
-run: red_triangle 
+run: all
 	./red_triangle
 
 $(ODIR)/%.o: %.cpp $(DEPS)
@@ -26,4 +31,4 @@ $(ODIR)/%.o: %.cpp $(DEPS)
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ red_triangle
+	rm -rf $(ODIR) *~ core $(INCDIR)/*~ red_triangle
