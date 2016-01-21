@@ -50,9 +50,9 @@ void
 display( void )
 {
     glClear( GL_COLOR_BUFFER_BIT );     // clear the window
-    glDrawArrays( GL_TRIANGLES, 0, 3 );    // draw the points
-    glDrawArrays( GL_TRIANGLES, 3, 6);
-    glDrawArrays( GL_TRIANGLES, 9, 9);
+    glDrawArrays( GL_TRIANGLES, 0, 18 );    // draw the points
+    // glDrawArrays( GL_TRIANGLES, 3, 6);
+    //glDrawArrays( GL_TRIANGLES, 9, 9);
     glFlush();
 }
 
