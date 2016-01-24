@@ -6,3 +6,6 @@ clean:
 
 run:
 	cd src && $(MAKE) run
+
+run2:
+	cd src && $(MAKE) run2
