@@ -23,6 +23,6 @@ public:
 private:
     GLuint vao, vbo, ebo;
     void initMesh();
-	int type; //primitive type
+	int type; //primitive type ie GL_TRIANGLES, GL_TRIANGLE_STRIP, ..etc
 };
 #endif
