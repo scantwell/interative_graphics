@@ -16,11 +16,12 @@ struct Light
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+	int camera_light;
 };
 
 uniform Material material;
-uniform Light light1;
-uniform Light light2;
+const int NUM_LIGHTS = 3;
+uniform Light lights[NUM_LIGHTS];
 uniform mat4 modelView;
 uniform mat4 projection;
 uniform vec3 eyePosition;
@@ -28,45 +29,32 @@ uniform vec3 eyePosition;
 void
 main()
 {
-	vec3 diffuseLight1 = light1.diffuse * material.diffuse;
-	vec3 diffuseLight2 = light2.diffuse * material.diffuse;
-
-	vec3 specularLight1 = light1.specular * material.specular;
-	vec3 specularLight2 = light2.specular * material.specular;
-
-	vec3 ambient = light1.ambient * material.ambient;
-	ambient += light2.ambient * material.ambient;
-
-	vec3 pos = (modelView * vec4(vPosition, 1.0)).xyz;
-
-	//vec3 L1 = normalize((modelView * vec4(light1.position, 1.0)).xyz - pos);
-	vec3 L1 = normalize(light1.position - pos);
-	vec3 E1 = normalize(-pos);
-	vec3 H1 = normalize(L1 + E1);
-
-	//vec3 L2 = normalize((modelView * vec4(light2.position, 1.0)).xyz - pos);
-	vec3 L2 = normalize(light2.position - pos);
-	vec3 E2 = normalize(-pos);
-	vec3 H2 = normalize(L2 + E2);
-
+	vec3 diffuse = vec3(0, 0, 0);
+	vec3 specular = vec3(0, 0, 0);
+	vec3 ambient = vec3(0, 0, 0);
 	vec3 N = normalize(modelView * vec4(vNormal, 0.0)).xyz;
 
-	float Kd = max(dot(L1,N), 0.0);
-	vec3 diffuse = Kd * diffuseLight1;
-	
-	Kd = max(dot(L2,N), 0.0);
-	diffuse += Kd * diffuseLight2;
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		vec3 L, E, H, diffuseProduct, specularProduct, pos;
+		float Kd, Ks;
 
-	float Ks = pow(max(dot(N, H1), 0.0), material.shininess);
-	vec3 specular = Ks * specularLight1;
-	
-	Ks = pow(max(dot(N, H1), 0.0), material.shininess);
-	specular += Ks * specularLight1;
+		diffuseProduct = lights[i].diffuse * material.diffuse;
+		specularProduct = lights[i].specular * material.specular;
 
+		pos = (modelView * vec4(vPosition, 1.0)).xyz;
 
+		L = normalize((modelView * vec4(lights[i].position, 1.0)).xyz - pos);
+		E = normalize(-pos);
+		H = normalize(L + E);
+		Kd = max(dot(L, N), 0.0);
+		Ks = pow(max(dot(N, H), 0.0), material.shininess); 
 
-	vFragColors = ambient + diffuse + specular; //diffuseLight1;
+		diffuse += Kd * diffuseProduct;
+		specular += Ks * specularProduct;
+		ambient += lights[i].ambient * material.ambient;
+	}
+
+	vFragColors = min(ambient, 1) + min(diffuse, 1) + min(specular, 1);
 	gl_Position = projection * modelView * vec4(vPosition, 1.0);
-	//vFragColors = vec4(material.diffuse, 1.0);
-    //gl_Position = transform * vec4(vPosition, 1.0);
 }
